@@ -1,0 +1,16 @@
+# - Config file for the LibTui package
+# It defines the following variables
+#  LIBTUI_INCLUDE_DIRS - include directories for LibTui
+#  LIBTUI_LIBRARIES    - libraries to link against
+
+# Compute paths
+get_filename_component(LIBTUI_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(LIBTUI_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET tui)
+  include("${LIBTUI_CMAKE_DIR}/LibTuiExports.cmake")
+endif()
+
+# These are IMPORTED targets created by LibTuiTargets.cmake
+set(LIBTUI_LIBRARIES tui)

@@ -10,7 +10,11 @@ namespace tui {
 
     void refresh();   // redraws the window
   protected:
+    virtual void parent_resize(int w, int h);
+  protected:
     WINDOW *cwin; // curses window
+
+    friend class Application;
   };
 }
 

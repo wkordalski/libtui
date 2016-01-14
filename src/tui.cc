@@ -1,19 +1,36 @@
 #include "tui.hh"
 
 #include <cassert>
+#include <thread>
 
 #include <ncurses.h>
+#include <signal.h>
 #include <unistd.h>
 
-
+namespace {
+  tui::Application *currapp = nullptr;
+  void on_terminal_resize_handler(int) {
+    if(currapp != nullptr) {
+      currapp->terminal_resize();
+      signal(SIGWINCH, on_terminal_resize_handler);
+    }
+  }
+}
 
 namespace tui {
   Application::Application() {
     using namespace std::placeholders;
+    if(currapp != nullptr) {
+      throw std::logic_error("Can not create more than one instance of tui::Application");
+    }
+
+    currapp = this;
+
     this->running = false;
-    this->fds.push_back(pollfd{STDIN_FILENO, POLLIN});
-    this->fds_actions.push_back(std::bind(&Application::on_keyboard, this, _1));
+    signal(SIGWINCH, on_terminal_resize_handler);
     initscr();
+    // Get screen size
+    std::tie(this->width, this->height) = this->get_screen_size();
     if(::has_colors()) {
       this->has_colors = true;
       start_color();
@@ -28,39 +45,100 @@ namespace tui {
 
   Application::~Application() {
     endwin();
+    currapp = nullptr;
   }
 
   void Application::run() {
-    // TODO: throw exception instead of asserting
-    assert(this->running == false);
+    if(this->running) {
+      throw std::logic_error("Can not run running tui::Application.");
+    }
+
+    std::thread keyboard_thread (std::bind(&Application::keyboard_worker, this));
 
     this->running = true;
-    while(this->running && this->window != nullptr) {
-      // no windows - no running
-      switch(poll(this->fds.data(), this->fds.size(), -1)) {
-        case -1:
-          this->refresh();
-          break;
-        default:
-          for(int i = 0; i < this->fds.size(); i++) {
-            if(this->fds[i].revents & this->fds[i].events) {
-              this->fds_actions[i](this->fds[i].revents);
-            }
-          }
-          // There is no refresh - we don't need it until widget asks for it
+    while(this->running) {
+      std::unique_lock<std::mutex> lock(this->call_queue_mutex);
+      this->call_processor_cv.wait(lock,
+        [this] ()->bool { return !this->call_queue.empty(); } );
+
+      std::queue<std::function<void()>> local_call_queue;
+      this->call_queue.swap(local_call_queue);
+
+      lock.unlock();
+
+      while(!local_call_queue.empty() && this->running) {
+        auto e = local_call_queue.front();
+        local_call_queue.pop();
+        e();
       }
     }
+
+    keyboard_thread.join();
   }
 
   void Application::exit() {
     this->running = false;
   }
 
-  void Application::refresh() {
-    // TODO
+  void Application::call(std::function<void()> action) {
+    // Add element to the queue
+    {
+      std::lock_guard<std::mutex> lock(this->call_queue_mutex);
+      this->call_queue.push(move(action));
+    }
+    // Call processor
+    this->call_processor_cv.notify_one();
   }
 
-  void Application::on_keyboard(short event) {
-    // TODO
+  void Application::refresh() {
+    // check if we need to send on_resize()...
+  }
+
+  void Application::on_terminal_resize() {
+    int w, h;
+    std::tie(w, h) = this->get_screen_size();
+    if(this->width != w || this->height != h) {
+      this->width = w;
+      this->height = h;
+
+      // Call parent
+      if(this->window != nullptr) {
+        this->window->parent_resize(this->width, this->height);
+      }
+    }
+  }
+
+  void Application::terminal_resize() {
+    this->call(std::bind(&Application::on_terminal_resize, this));
+  }
+
+  void Application::on_keyboard(int ch) {
+    if(ch == KEY_F(1)) {
+      this->exit();
+    }
+  }
+
+  std::pair<int, int> Application::get_screen_size() {
+    int w, h, x, y;
+    getbegyx(stdscr, y, x);
+    getmaxyx(stdscr, h, w);
+    return {w-x, h-y};
+  }
+
+  void Application::keyboard_worker() {
+    struct pollfd ufds;
+    ufds.fd = STDIN_FILENO;
+    ufds.events = POLLIN;
+    while(this->running) {
+      switch(poll(&ufds, 1, 200)) {
+      case -1:
+        break;
+      default:
+        if(ufds.revents & POLLIN) {
+          int ch = getch();
+          this->call(std::bind(&Application::on_keyboard, this, ch));
+        }
+      }
+    }
   }
 }
