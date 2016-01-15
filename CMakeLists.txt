@@ -24,11 +24,24 @@ configure_file(cmake/LibTuiConfigVersion.cmake.in
 set(SRCS
   src/tui.cc
   src/window.cc
+  src/label.cc
+
+  src/text.cc
 )
 
 set(INCS
   src/tui.hh
+
+  src/widget.hh
+
   src/window.hh
+  src/label.hh
+
+  src/point.hh
+  src/size.hh
+  src/positioning.hh
+
+  src/text.hh
 )
 
 foreach(INC IN ITEMS ${INCS})
@@ -41,7 +54,7 @@ set(INSTALL_CMAKE_DIR lib/libtui-${LibTui_VERSION}/cmake CACHE PATH
   "Install path for CMake files")
 
 # handle it in other way when we switch to cmake 3.*
-add_definitions(-std=c++11)
+add_definitions(-std=c++11 -g)
 
 include_directories(${CURSES_INCLUDE_DIRS})
 

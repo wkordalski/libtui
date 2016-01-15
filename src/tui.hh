@@ -12,7 +12,7 @@
 #include <sys/poll.h>
 
 namespace tui {
-  class Window;
+  class IWindow;
 
   class Application {
   public:
@@ -30,22 +30,28 @@ namespace tui {
     // used by signal handlers to notify about terminal resize
     void terminal_resize();
 
+
+
   protected:
     void refresh();                   // redraws the screen
     void on_terminal_resize();
     void on_keyboard(int ch);
-    std::pair<int, int> get_screen_size();  // x and y
+    Size get_screen_size();  // x and y
     void keyboard_worker();
   protected:
-    Window * window;
+    Widget * window;
     bool running;
     bool has_colors;
-    int width, height;
+    Size screen_size;
 
     // calling...
     std::queue<std::function<void()>> call_queue;
     std::mutex call_queue_mutex;
     std::condition_variable call_processor_cv;
+
+
+  public:
+    void set_widget(Widget *w) { this->window = w; }
   };
 }
 

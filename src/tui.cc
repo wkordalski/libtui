@@ -30,7 +30,7 @@ namespace tui {
     signal(SIGWINCH, on_terminal_resize_handler);
     initscr();
     // Get screen size
-    std::tie(this->width, this->height) = this->get_screen_size();
+    this->screen_size = this->get_screen_size();
     if(::has_colors()) {
       this->has_colors = true;
       start_color();
@@ -41,6 +41,7 @@ namespace tui {
     // or raw() - it do not redirect Ctrl+C and Ctrl+Z to signal handlers
     noecho();
     keypad(stdscr, TRUE);
+    curs_set(0);
   }
 
   Application::~Application() {
@@ -52,10 +53,14 @@ namespace tui {
     if(this->running) {
       throw std::logic_error("Can not run running tui::Application.");
     }
+    this->running = true;
 
     std::thread keyboard_thread (std::bind(&Application::keyboard_worker, this));
 
-    this->running = true;
+    if(this->window != nullptr) {
+      this->window->refresh();
+    }
+
     while(this->running) {
       std::unique_lock<std::mutex> lock(this->call_queue_mutex);
       this->call_processor_cv.wait(lock,
@@ -92,18 +97,19 @@ namespace tui {
 
   void Application::refresh() {
     // check if we need to send on_resize()...
+    if(this->window != nullptr) {
+      this->window->refresh();
+    }
   }
 
   void Application::on_terminal_resize() {
-    int w, h;
-    std::tie(w, h) = this->get_screen_size();
-    if(this->width != w || this->height != h) {
-      this->width = w;
-      this->height = h;
+    Size tmp = this->get_screen_size();
+    if(this->screen_size != tmp) {
+      this->screen_size = tmp;
 
-      // Call parent
+      // Call window
       if(this->window != nullptr) {
-        this->window->parent_resize(this->width, this->height);
+        this->window->parent_resize(this->screen_size);
       }
     }
   }
@@ -116,13 +122,17 @@ namespace tui {
     if(ch == KEY_F(1)) {
       this->exit();
     }
+    this->refresh();
   }
 
-  std::pair<int, int> Application::get_screen_size() {
+  Size Application::get_screen_size() {
+    /*
     int w, h, x, y;
     getbegyx(stdscr, y, x);
     getmaxyx(stdscr, h, w);
     return {w-x, h-y};
+    */
+    return {COLS, LINES};
   }
 
   void Application::keyboard_worker() {
