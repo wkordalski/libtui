@@ -1,19 +1,28 @@
 #include "tui.hh"
 
 #include <cassert>
+#include <iostream>
 #include <thread>
 
 #include <ncurses.h>
 #include <signal.h>
 #include <unistd.h>
 
+#include <sys/ioctl.h>
+
 namespace {
   tui::Application *currapp = nullptr;
-  void on_terminal_resize_handler(int) {
+  void on_terminal_resize_handler(int sig) {
+    struct winsize size;
+
+    if (ioctl(fileno(stdout), TIOCGWINSZ, &size) == 0) {
+        resize_term(size.ws_row, size.ws_col);
+        //wrefresh(curscr);   /* Linux needs this */
+    }
     if(currapp != nullptr) {
       currapp->terminal_resize();
-      signal(SIGWINCH, on_terminal_resize_handler);
     }
+    signal(SIGWINCH, on_terminal_resize_handler);
   }
 }
 
@@ -27,7 +36,6 @@ namespace tui {
     currapp = this;
 
     this->running = false;
-    signal(SIGWINCH, on_terminal_resize_handler);
     initscr();
     // Get screen size
     this->screen_size = this->get_screen_size();
@@ -42,6 +50,7 @@ namespace tui {
     noecho();
     keypad(stdscr, TRUE);
     curs_set(0);
+    signal(SIGWINCH, on_terminal_resize_handler);
   }
 
   Application::~Application() {
@@ -58,6 +67,8 @@ namespace tui {
     std::thread keyboard_thread (std::bind(&Application::keyboard_worker, this));
 
     if(this->window != nullptr) {
+      this->screen_size = {0, 0};
+      this->on_terminal_resize();
       this->window->refresh();
     }
 
@@ -121,18 +132,20 @@ namespace tui {
   void Application::on_keyboard(int ch) {
     if(ch == KEY_F(1)) {
       this->exit();
+    } else {
+      if(this->window) this->window->key(ch);
     }
     this->refresh();
   }
 
   Size Application::get_screen_size() {
-    /*
+
     int w, h, x, y;
     getbegyx(stdscr, y, x);
     getmaxyx(stdscr, h, w);
     return {w-x, h-y};
-    */
-    return {COLS, LINES};
+
+    //return {COLS, LINES};
   }
 
   void Application::keyboard_worker() {

@@ -23,8 +23,11 @@ configure_file(cmake/LibTuiConfigVersion.cmake.in
 
 set(SRCS
   src/tui.cc
-  src/window.cc
+
+  src/button.cc
   src/label.cc
+  src/textbox.cc
+  src/window.cc
 
   src/text.cc
 )
@@ -34,8 +37,10 @@ set(INCS
 
   src/widget.hh
 
-  src/window.hh
+  src/button.hh
   src/label.hh
+  src/textbox.hh
+  src/window.hh
 
   src/point.hh
   src/size.hh
@@ -85,6 +90,3 @@ install(EXPORT LibTuiExports
   DESTINATION ${INSTALL_CMAKE_DIR}
   COMPONENT dev
 )
-
-add_executable(make_test test/main.cc)
-target_link_libraries(make_test tui)

@@ -33,6 +33,12 @@ namespace tui {
   protected:
     virtual void parent_resize(Size parent_size) = 0;
     virtual void draw() = 0;
+    virtual void focus() {}
+    virtual void blur() {}
+    virtual void key(int ch) { /* ignore */ }
+    virtual bool is_container() { return false; }
+    virtual bool is_focusable() { return false; }
+    virtual void set_cursor() {}
 
     friend class Window;
     friend class Application;

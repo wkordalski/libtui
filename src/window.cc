@@ -15,9 +15,11 @@ namespace tui {
     }
 
     void Window::refresh() {
+      this->draw();
       for(auto w : widgets) {
         w->draw();
       }
+      this->set_cursor();
       ::wrefresh(cwin);
     }
     void Window::resize(Point position, Size size) {
@@ -25,6 +27,7 @@ namespace tui {
       this->position = position;
       this->size = size;
       cwin = newwin(size.h, size.w, position.y, position.x);
+      this->refresh();
     }
 
     void Window::add(Widget *widget) {
@@ -39,7 +42,9 @@ namespace tui {
     const Window * Window::get_window() const { return this; }
     Window * Window::get_window() { return this; }
 
-    void Window::draw() {}
+    void Window::draw() {
+      ::wborder(cwin, '|', '|', '=', '-', '=', '=', '+', '+');
+    }
 
     void Window::parent_resize(Size parent_size) {
       Point p;
