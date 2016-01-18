@@ -1,6 +1,7 @@
 #include "window.hh"
 
 #include "text.hh"
+#include "tui.hh"
 #include <stdio.h>
 
 namespace tui {
@@ -45,7 +46,8 @@ namespace tui {
     }
     widget->parent = this;
     widgets.push_back(widget);
-    if(widgets.size() == 1) {
+    if(widgets[focused]->is_focusable() == false || widgets.size() == 1) {
+      focused = widgets.size() - 1;
       widget->focus();
     }
   }
@@ -101,5 +103,22 @@ namespace tui {
         widgets[focused]->key(ch);
       }
     }
+  }
+
+  void Window::set_child_window(Window *window) {
+    if(window) {
+      // loose focus
+      if(widgets.size() > 0) widgets[focused]->blur();
+      child = window;
+      child->parent = this;
+      child->parent_resize(size);
+      child->focus();
+    } else {
+      child->blur();
+      child->parent = nullptr;
+      child = window;
+      if(widgets.size() > 0) widgets[focused]->focus();
+    }
+    app->refresh();
   }
 }

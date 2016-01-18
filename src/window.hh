@@ -33,22 +33,10 @@ namespace tui {
     void set_title(const std::string &title) {
       this->title = title;
     }
-    void set_child_window(Window *window) {
-      if(window) {
-        // loose focus
-        if(widgets.size() > 0) widgets[focused]->blur();
-        child = window;
-        child->parent = this;
-        child->parent_resize(size);
-        child->focus();
-      } else {
-        child->blur();
-        child->parent = nullptr;
-        child = window;
-        if(widgets.size() > 0) widgets[focused]->focus();
-      }
-      this->refresh();
+    Window * get_child_window() {
+      return this->child;
     }
+    void set_child_window(Window *window);
   protected:
     virtual void parent_resize(Size parent_size);
     virtual void focus() {}

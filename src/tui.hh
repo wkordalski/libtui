@@ -31,12 +31,13 @@ namespace tui {
     void terminal_resize();
 
 
-
-  protected:
     void refresh();                   // redraws the screen
+    Size get_screen_size();  // x and y
+  protected:
+
     void on_terminal_resize();
     void on_keyboard(int ch);
-    Size get_screen_size();  // x and y
+
     void keyboard_worker();
   protected:
     Widget * window;
