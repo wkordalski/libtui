@@ -26,6 +26,7 @@ set(SRCS
 
   src/button.cc
   src/label.cc
+  src/progressbar.cc
   src/textbox.cc
   src/window.cc
 
@@ -39,6 +40,7 @@ set(INCS
 
   src/button.hh
   src/label.hh
+  src/progressbar.hh
   src/textbox.hh
   src/window.hh
 

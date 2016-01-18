@@ -8,7 +8,8 @@
 #include <utility>
 
 namespace tui {
-  using Locator = std::function<std::pair<Point, Size>(Size)>;
+  using Rectangle = std::pair<Point, Size>;
+  using Locator = std::function<Rectangle(Size)>;
 }
 
 #endif /* end of include guard: _LIBTUI_POSITIONING_HH_ */

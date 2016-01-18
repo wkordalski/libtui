@@ -8,12 +8,17 @@
 namespace tui {
   class Button : public Widget {
   public:
-    Button(Widget *parent, Point position, Size size, std::string text = "");
+    Button(Application *app, std::string text = "");
 
 
     void set_action(const std::function<void()>& action) {
       this->action = action;
     }
+
+    void set_locator(Locator locator) {
+      this->locator = locator;
+    }
+
   protected:
     virtual void draw() {
       WINDOW *cwin = this->get_window()->get_curses_window();
@@ -26,8 +31,7 @@ namespace tui {
       ::waddch(cwin, focused?']':'>');
     }
     virtual void parent_resize(Size parent_size) {
-      // TODO
-      return;
+      std::tie(position, size) = locator(parent_size);
     }
     virtual void key(int ch) {
       if(ch == '\n') {
@@ -36,6 +40,7 @@ namespace tui {
     }
     virtual void focus() { focused = true; }
     virtual void blur() { focused = false; }
+    virtual bool is_focusable() { return true; }
 
   protected:
     std::string text = "";

@@ -1,6 +1,8 @@
 #include "button.hh"
 
 namespace tui {
-  Button::Button(Widget *parent, Point position, Size size, std::string text)
-    : Widget(parent), position(position), size(size), text(text) {}
+  Button::Button(Application *app, std::string text)
+    : Widget(app), text(text) {
+      this->locator = [](Size s)->std::pair<Point, Size> { return {}; };
+    }
 }

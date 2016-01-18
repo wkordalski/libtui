@@ -1,2 +1,2 @@
-# libtui
-Text UI library
+# LibTui
+Text UI library for C++

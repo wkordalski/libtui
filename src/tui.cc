@@ -108,6 +108,8 @@ namespace tui {
 
   void Application::refresh() {
     // check if we need to send on_resize()...
+    ::clear();
+    ::refresh();
     if(this->window != nullptr) {
       this->window->refresh();
     }
@@ -122,6 +124,7 @@ namespace tui {
       if(this->window != nullptr) {
         this->window->parent_resize(this->screen_size);
       }
+      this->refresh();
     }
   }
 

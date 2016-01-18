@@ -2,11 +2,8 @@
 
 namespace tui {
 
-  Label::Label(Widget *parent, Point position, Size size, std::string text)
-      : Widget(parent), text(text), position(position), size(size) {
-      if(size.h != 1) {
-        throw std::invalid_argument("Label height must be one row - right now");
-      }
+  Label::Label(Application *app, std::string text)
+      : Widget(app), text(text) {
       locator = [this] (Size parent_size) -> std::pair<Point, Size> {
         return {this->position, this->size};
       };

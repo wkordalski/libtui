@@ -12,7 +12,7 @@
 namespace tui {
   class Window : public Widget {
   public:
-    Window(Widget *parent, Point position, Size size);
+    Window(Application *app);
     virtual ~Window();
 
     virtual void refresh();
@@ -30,26 +30,30 @@ namespace tui {
     void set_locator(const Locator &locator) {
       this->window_locator = locator;
     }
+    void set_title(const std::string &title) {
+      this->title = title;
+    }
+    void set_child_window(Window *window) {
+      if(window) {
+        // loose focus
+        if(widgets.size() > 0) widgets[focused]->blur();
+        child = window;
+        child->parent = this;
+        child->parent_resize(size);
+        child->focus();
+      } else {
+        child->blur();
+        child->parent = nullptr;
+        child = window;
+        if(widgets.size() > 0) widgets[focused]->focus();
+      }
+      this->refresh();
+    }
   protected:
     virtual void parent_resize(Size parent_size);
     virtual void focus() {}
     virtual void blur() {}
-    virtual void key(int ch) {
-      if(ch == '\t') {
-        if(widgets.size() > 0 && widgets[focused]->is_container()) {
-          widgets[focused]->key(ch);
-        } else if(widgets.size() > 1) {
-          widgets[focused]->blur();
-          focused++;
-          focused %= widgets.size();
-          widgets[focused]->focus();
-        }
-      } else {
-        if(widgets.size() > 0) {
-          widgets[focused]->key(ch);
-        }
-      }
-    }
+    virtual void key(int ch);
     virtual bool is_container() { return false; }
 
     virtual void set_cursor() {
@@ -64,7 +68,9 @@ namespace tui {
     Size size;
     Locator window_locator;
     std::vector<Widget *> widgets;
+    Window *child = nullptr;
     int focused = 0;
+    std::string title = "";
   };
 }
 

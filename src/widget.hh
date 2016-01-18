@@ -6,20 +6,25 @@
 #include <ncurses.h>
 
 namespace tui {
+  class Application;
   class Window;
 
   class Widget {
   protected:
+    Application *app = nullptr;
     Widget * parent = nullptr;
+    bool visible = true;
   public:
     Widget() = delete;
     Widget(const Widget &) = delete;
+    Widget(Application *app) : app(app) {}
+    Widget(Application *app, Widget *parent) : app(app), parent(parent) {}
     Widget(Widget *parent) : parent(parent) {}
     virtual ~Widget() {}
 
     Widget & operator= (const Widget &) = delete;
 
-    virtual void refresh() {};
+    virtual void refresh() { };
 
     const Widget * get_parent() const { return parent; }
     Widget * get_parent() { return parent; }
@@ -29,6 +34,8 @@ namespace tui {
     virtual Window * get_window() {
       if(parent != nullptr) return parent->get_window(); else return nullptr;
     }
+
+    virtual Application * get_application() { return app; }
 
   protected:
     virtual void parent_resize(Size parent_size) = 0;

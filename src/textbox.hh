@@ -8,7 +8,11 @@
 namespace tui {
   class TextBox : public Widget {
   public:
-    TextBox(Widget *parent, Point position, Size size);
+    TextBox(Application *app);
+
+    void set_locator(Locator locator) {
+      this->locator = locator;
+    }
 
   protected:
     virtual void draw();
@@ -27,6 +31,9 @@ namespace tui {
       ::curs_set(0);
       shift = 0;
     }
+
+    virtual bool is_focusable() { return true; }
+
     virtual void key(int ch) {
       if(ch == KEY_LEFT) {
         if(cursor > 0) {

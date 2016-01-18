@@ -11,10 +11,20 @@
 namespace tui {
   class Label : public Widget {
   public:
-    Label(Widget *parent, Point position, Size size, std::string text = "");
+    Label(Application *app, std::string text = "");
+
+    void set_text(std::string text) {
+      this->text = text;
+      this->get_window()->refresh();
+    }
 
     void set_text_align(TextAlign align) {
       this->align = align;
+      this->get_window()->refresh();
+    }
+
+    void set_locator(Locator locator) {
+      this->locator = locator;
     }
   protected:
     virtual void draw();
