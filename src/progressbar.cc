@@ -3,7 +3,7 @@
 namespace tui {
   ProgressBar::ProgressBar(Application *app) :
     Widget(app) {
-    locator = [this] (Size s) -> std::pair<Point, Size>
+    locator = [this] (Rectangle s) -> Rectangle
       { return {this->position, this->size}; };
   }
 

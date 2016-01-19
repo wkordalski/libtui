@@ -122,7 +122,7 @@ namespace tui {
 
       // Call window
       if(this->window != nullptr) {
-        this->window->parent_resize(this->screen_size);
+        this->window->parent_resize({{0,0}, this->screen_size});
       }
       this->refresh();
     }

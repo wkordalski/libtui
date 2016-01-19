@@ -16,8 +16,8 @@ namespace tui {
 
   protected:
     virtual void draw();
-    virtual void parent_resize(Size parent_size) {
-      std::tie(position, size) = locator(parent_size);
+    virtual void parent_resize(Rectangle parent) {
+      std::tie(position, size) = locator(parent);
     }
     virtual void focus() {
       this->focused = true;

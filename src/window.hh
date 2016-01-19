@@ -38,7 +38,7 @@ namespace tui {
     }
     void set_child_window(Window *window);
   protected:
-    virtual void parent_resize(Size parent_size);
+    virtual void parent_resize(Rectangle parent);
     virtual void focus() {}
     virtual void blur() {}
     virtual void key(int ch);

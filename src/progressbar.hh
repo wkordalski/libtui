@@ -52,9 +52,9 @@ namespace tui {
         // TODO - print progress bar
       }
     }
-    virtual void parent_resize(Size parent_size) {
+    virtual void parent_resize(Rectangle parent) {
       std::lock_guard<std::mutex> lock(this->mutex);
-      std::tie(position, size) = locator(parent_size);
+      std::tie(position, size) = locator(parent);
       ms_per_shift = 1000*100/(size.w * velocity);
     }
 

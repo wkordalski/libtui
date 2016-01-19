@@ -38,7 +38,7 @@ namespace tui {
     virtual Application * get_application() { return app; }
 
   protected:
-    virtual void parent_resize(Size parent_size) = 0;
+    virtual void parent_resize(tui::Rectangle parent) = 0;
     virtual void draw() = 0;
     virtual void focus() {}
     virtual void blur() {}

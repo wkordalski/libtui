@@ -30,8 +30,8 @@ namespace tui {
       ::wmove(cwin, position.y, position.x+size.w-1);
       ::waddch(cwin, focused?']':'>');
     }
-    virtual void parent_resize(Size parent_size) {
-      std::tie(position, size) = locator(parent_size);
+    virtual void parent_resize(Rectangle parent) {
+      std::tie(position, size) = locator(parent);
     }
     virtual void key(int ch) {
       if(ch == '\n') {

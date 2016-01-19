@@ -4,7 +4,7 @@ namespace tui {
 
   Label::Label(Application *app, std::string text)
       : Widget(app), text(text) {
-      locator = [this] (Size parent_size) -> std::pair<Point, Size> {
+      locator = [this] (Rectangle parent) -> Rectangle {
         return {this->position, this->size};
       };
     }
@@ -23,7 +23,7 @@ namespace tui {
     ::wprintw(cwin, "%s", str.c_str());
   }
 
-    void Label::parent_resize(Size parent_size) {
-      std::tie(position, size) = locator(parent_size);
+    void Label::parent_resize(Rectangle parent) {
+      std::tie(position, size) = locator(parent);
     }
 }

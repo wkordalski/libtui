@@ -2,7 +2,7 @@
 
 namespace tui {
   TextBox::TextBox(Application *app) : Widget(app) {
-    this->locator = [this](Size s) -> std::pair<Point, Size> { return {this->position, this->size}; };
+    this->locator = [this](Rectangle s) -> Rectangle { return {this->position, this->size}; };
   }
 
   void TextBox::draw() {

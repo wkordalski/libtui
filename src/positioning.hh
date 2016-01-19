@@ -8,8 +8,12 @@
 #include <utility>
 
 namespace tui {
+  class Application;
+
   using Rectangle = std::pair<Point, Size>;
-  using Locator = std::function<Rectangle(Size)>;
+  using Locator = std::function<Rectangle(Rectangle)>;
+
+  Rectangle center_screen_locator(Rectangle parent, Application *app, Size target);
 }
 
 #endif /* end of include guard: _LIBTUI_POSITIONING_HH_ */

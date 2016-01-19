@@ -8,9 +8,9 @@ namespace tui {
 
   Window::Window(Application *app) : Widget(app) {
     cwin = newwin(size.h, size.w, position.y, position.x);
-    window_locator = [this](Size parent_size) -> std::pair<Point, Size>
+    window_locator = [this](Rectangle parent) -> Rectangle
     {
-      return {{0,0}, parent_size};
+      return {{0,0}, parent.second};
     };
   }
   Window::~Window() {
@@ -34,9 +34,9 @@ namespace tui {
     this->size = size;
     cwin = newwin(size.h, size.w, position.y, position.x);
     for(auto w : widgets) {
-      w->parent_resize(size);
+      w->parent_resize({position, size});
     }
-    if(child) child->parent_resize(size);
+    if(child) child->parent_resize({position, size});
     this->refresh();
   }
 
@@ -72,10 +72,10 @@ namespace tui {
     }
   }
 
-  void Window::parent_resize(Size parent_size) {
+  void Window::parent_resize(Rectangle parent) {
     Point p;
     Size s;
-    std::tie(p, s) = this->window_locator(parent_size);
+    std::tie(p, s) = this->window_locator(parent);
     this->resize(p, s);
   }
 
@@ -111,7 +111,7 @@ namespace tui {
       if(widgets.size() > 0) widgets[focused]->blur();
       child = window;
       child->parent = this;
-      child->parent_resize(size);
+      child->parent_resize({position, size});
       child->focus();
     } else {
       child->blur();

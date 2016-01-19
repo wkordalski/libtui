@@ -25,10 +25,13 @@ set(SRCS
   src/tui.cc
 
   src/button.cc
+  src/checkbox.cc
   src/label.cc
   src/progressbar.cc
   src/textbox.cc
   src/window.cc
+
+  src/positioning.cc
 
   src/text.cc
 )
@@ -39,6 +42,7 @@ set(INCS
   src/widget.hh
 
   src/button.hh
+  src/checkbox.hh
   src/label.hh
   src/progressbar.hh
   src/textbox.hh
