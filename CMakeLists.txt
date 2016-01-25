@@ -23,10 +23,13 @@ configure_file(cmake/LibTuiConfigVersion.cmake.in
 
 set(SRCS
   src/tui.cc
+  
+  src/widget.cc
 
   src/button.cc
   src/checkbox.cc
   src/label.cc
+  src/listbox.cc
   src/progressbar.cc
   src/textbox.cc
   src/window.cc
@@ -44,6 +47,7 @@ set(INCS
   src/button.hh
   src/checkbox.hh
   src/label.hh
+  src/listbox.hh
   src/progressbar.hh
   src/textbox.hh
   src/window.hh

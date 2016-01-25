@@ -24,7 +24,7 @@ namespace tui {
 
     Widget & operator= (const Widget &) = delete;
 
-    virtual void refresh() { };
+    virtual void refresh();
 
     const Widget * get_parent() const { return parent; }
     Widget * get_parent() { return parent; }

@@ -22,9 +22,6 @@ namespace tui {
       this->draw();
       this->set_cursor();
       ::wrefresh(cwin);
-      for(auto w : widgets) {
-        w->refresh();
-      }
       if(child) child->refresh();
     }
   }
@@ -59,6 +56,7 @@ namespace tui {
 
   void Window::draw() {
     if(visible) {
+      ::wclear(cwin);
       ::wborder(cwin, '|', '|', '=', '-', '=', '=', '+', '+');
       if(!title.empty()) {
         int wdt = size.w - 8;
